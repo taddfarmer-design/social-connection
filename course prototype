@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Connections - Learning Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3B82A0;
+            --primary-light: #E8F4F8;
+            --accent: #7BAE94;
+            --accent-light: #E8F3EE;
+            --bg-white: #FFFFFF;
+            --bg-light: #F7FAFB;
+            --text-dark: #1E3A4F;
+            --text-light: #6B8499;
+            --shadow: 0 2px 12px rgba(30, 58, 79, 0.06);
+            --shadow-md: 0 4px 20px rgba(30, 58, 79, 0.1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #F0F7FB 0%, #F7FAFB 100%);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #F0F7FB 0%, #F7FAFB 100%);
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 40px;
+            border: 12px solid #000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 28px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .screen-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-top: 12px;
+        }
+
+        .screen {
+            display: none;
+            flex: 1;
+            opacity: 0;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 36px;
+            background: var(--bg-white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            font-size: 12px;
+            color: var(--text-dark);
+            border-bottom: 1px solid rgba(30, 58, 79, 0.08);
+            position: relative;
+            z-index: 5;
+        }
+
+        .status-bar-left, .status-bar-right {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            height: 60px;
+            background: var(--bg-white);
+            border-top: 1px solid rgba(30, 58, 79, 0.08);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0;
+            position: relative;
+            z-index: 5;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s;
+            font-size: 11px;
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Screen Content */
+        .screen-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .centered-intro {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+            flex: 1;
+            position: relative;
+        }
+
+        .centered-intro h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .centered-intro p {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* Welcome Screen */
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .welcome-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .welcome-header p {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+
+        .carousel {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .carousel-slide {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.4s;
+        }
+
+        .carousel-slide.active {
+            display: block;
+        }
+
+        .carousel-slide h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .carousel-slide p {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #DDD;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .dot.active {
+            background: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            margin-top: auto;
+        }
+
+        .screen > .btn-primary {
+            margin: 12px 20px 20px;
+            flex-shrink: 0;
+        }
+
+        .btn-primary:hover {
+            background: #2E6B85;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: #E8EDF2;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Survey */
+        .survey-question {
+            margin-bottom: 24px;
+        }
+
+        .survey-question-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .likert-scale {
+            display: flex;
+            gap: 6px;
+            justify-content: space-between;
+        }
+
+        .likert-btn {
+            flex: 1;
+            padding: 10px 6px;
+            border: 2px solid #DDD;
+            border-radius: 8px;
+            background: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .likert-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .likert-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            padding: 16px 20px;
+            background: var(--bg-white);
+            border-bottom: 1px solid rgba(30, 58, 79, 0.08);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #E8EDF2;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        /* Section Cards Grid */
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-card {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .section-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: capitalize;
+        }
+
+        .badge-available {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .badge-completed {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .badge-locked {
+            background: #E8EDF2;
+            color: var(--text-light);
+        }
+
+        /* Chips */
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .chip {
+            padding: 8px 16px;
+            border: 2px solid #DDD;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            color: var(--text-dark);
+        }
+
+        .chip:hover {
+            border-color: var(--primary);
+        }
+
+        .chip.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Chat */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .chat-bubble {
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 85%;
+        }
+
+        .chat-ai {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            align-self: flex-start;
+        }
+
+        .chat-user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px 12px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #DDD;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .chat-input button {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Contact Cards */
+        .contact-card {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .contact-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .contact-role {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .contact-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #DDD;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .contact-card.selected .contact-checkbox {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Sticky Notes */
+        .sticky-notes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .sticky-note {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            line-height: 1.4;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .sticky-blue {
+            background: #E8F4F8;
+            color: #3B82A0;
+        }
+
+        .sticky-green {
+            background: #E8F3EE;
+            color: #7BAE94;
+        }
+
+        .sticky-cream {
+            background: #FEF9F0;
+            color: #C4956F;
+        }
+
+        /* Belief Cards */
+        .belief-card {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .belief-card:hover {
+            border-color: var(--primary);
+        }
+
+        .belief-card.selected {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .belief-card-text {
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        /* Slider */
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #DDD;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        /* Decorative Swoop */
+        .swoop {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            opacity: 1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes fadeInStory {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Chart */
+        .bar-chart {
+            margin: 16px 0;
+        }
+
+        .chart-bar {
+            margin-bottom: 12px;
+        }
+
+        .chart-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chart-bar-container {
+            height: 24px;
+            background: #E8EDF2;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        /* Hub Screen */
+        .hub-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .hub-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .hub-header p {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* Pathway Cards */
+        .pathway-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .pathway-card {
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(123, 174, 148, 0.1) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pathway-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .pathway-card h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .pathway-card p {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        /* Activity Previews */
+        .activity-preview {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .activity-preview-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .activity-preview-desc {
+            color: var(--text-light);
+            font-size: 11px;
+        }
+
+        /* Results */
+        .results-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .results-card {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .results-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        /* Responsive Desktop */
+        @media (min-width: 768px) {
+            .app-container {
+                justify-content: center;
+                padding: 40px 20px;
+            }
+
+            .phone-frame {
+                box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+            }
+        }
+
+        /* Scrollbar Styling */
+        .screen-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .screen-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .screen-content::-webkit-scrollbar-thumb {
+            background: rgba(30, 58, 79, 0.2);
+            border-radius: 3px;
+        }
+
+        .screen-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(30, 58, 79, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <svg style="position:absolute;width:0;height:0">
+        <defs>
+            <linearGradient id="swoopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#3B82A0;stop-opacity:1"/>
+                <stop offset="100%" style="stop-color:#7BAE94;stop-opacity:1"/>
+            </linearGradient>
+        </defs>
+    </svg>
+    <div class="app-container">
+        <div class="phone-frame">
+            <div class="status-bar">
+                <div class="status-bar-left">
+                    <span>9:41</span>
+                </div>
+                <div class="status-bar-right">
+                    <svg width="16" height="12" viewBox="0 0 16 12" fill="var(--text-dark)"><rect x="0" y="8" width="3" height="4" rx="0.5"/><rect x="4" y="5" width="3" height="7" rx="0.5"/><rect x="8" y="2" width="3" height="10" rx="0.5"/><rect x="12" y="0" width="3" height="12" rx="0.5"/></svg>
+                    <svg width="24" height="12" viewBox="0 0 24 12" fill="var(--text-dark)"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="2" y="3" width="14" height="6" rx="1" fill="currentColor"/><rect x="21" y="3.5" width="2" height="5" rx="1" fill="currentColor"/></svg>
+                </div>
+            </div>
+
+            <div class="screen-content" id="screenContent">
+                <!-- Screen 1: Welcome -->
+                <div class="screen active" id="screen-welcome">
+                    <div class="screen-body">
+                        <div class="welcome-header">
+                            <h1>Social<br>Connections</h1>
+                            <p>Building the connections that move you forward</p>
+                        </div>
+
+                        <div class="carousel">
+                            <div class="carousel-slide active">
+                                <h2>This isn't a course</h2>
+                                <p>It's a set of experiences designed to help you notice, understand, and use the connections around you.</p>
+                            </div>
+                            <div class="carousel-slide">
+                                <h2>Go at your own pace</h2>
+                                <p>Every activity is built for your phone. Nothing takes more than a few minutes.</p>
+                            </div>
+                            <div class="carousel-slide">
+                                <h2>Start where it feels right</h2>
+                                <p>You'll start with a quick check-in about how you see networking. Then you'll choose your own path.</p>
+                            </div>
+                        </div>
+
+                        <div class="carousel-dots">
+                            <div class="dot active" onclick="goToCarouselSlide(0)"></div>
+                            <div class="dot" onclick="goToCarouselSlide(1)"></div>
+                            <div class="dot" onclick="goToCarouselSlide(2)"></div>
+                        </div>
+
+                        <svg class="swoop" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M200 200 C200 120, 160 80, 80 80 C40 80, 10 100, 0 140 L0 200 Z" fill="url(#swoopGrad)" opacity="0.12"/>
+                            <path d="M200 200 C200 150, 170 110, 110 110 C70 110, 40 130, 20 160 L20 200 Z" fill="url(#swoopGrad)" opacity="0.08"/>
+                        </svg>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('survey')">Get Started</button>
+                </div>
+
+                <!-- Screen 2: Survey -->
+                <div class="screen" id="screen-survey">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 15%"></div>
+                        </div>
+                        <div class="progress-text">1 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: var(--text-dark);">Before we start, let's see where you are</h2>
+                        <p style="font-size: 13px; color: var(--text-light); margin-bottom: 20px;">How much do you agree with each statement?</p>
+
+                        <div class="survey-question">
+                            <div class="survey-question-text">Networking is something you're either good at or you're not</div>
+                            <div class="likert-scale">
+                                <button class="likert-btn" onclick="selectLikert(this, 'q1')">1</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q1')">2</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q1')">3</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q1')">4</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q1')">5</button>
+                            </div>
+                            <div class="slider-labels" style="margin-top: 8px;">
+                                <span style="font-size: 11px;">Strongly Disagree</span>
+                                <span style="font-size: 11px;">Disagree</span>
+                                <span style="font-size: 11px;">Neutral</span>
+                                <span style="font-size: 11px;">Agree</span>
+                                <span style="font-size: 11px;">Strongly Agree</span>
+                            </div>
+                        </div>
+
+                        <div class="survey-question">
+                            <div class="survey-question-text">I already have people in my life who support me — I just haven't noticed them all yet</div>
+                            <div class="likert-scale">
+                                <button class="likert-btn" onclick="selectLikert(this, 'q2')">1</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q2')">2</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q2')">3</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q2')">4</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q2')">5</button>
+                            </div>
+                            <div class="slider-labels" style="margin-top: 8px;">
+                                <span style="font-size: 11px;">Strongly Disagree</span>
+                                <span style="font-size: 11px;">Disagree</span>
+                                <span style="font-size: 11px;">Neutral</span>
+                                <span style="font-size: 11px;">Agree</span>
+                                <span style="font-size: 11px;">Strongly Agree</span>
+                            </div>
+                        </div>
+
+                        <div class="survey-question">
+                            <div class="survey-question-text">The ability to build relationships comes naturally to some people</div>
+                            <div class="likert-scale">
+                                <button class="likert-btn" onclick="selectLikert(this, 'q3')">1</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q3')">2</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q3')">3</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q3')">4</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q3')">5</button>
+                            </div>
+                            <div class="slider-labels" style="margin-top: 8px;">
+                                <span style="font-size: 11px;">Strongly Disagree</span>
+                                <span style="font-size: 11px;">Disagree</span>
+                                <span style="font-size: 11px;">Neutral</span>
+                                <span style="font-size: 11px;">Agree</span>
+                                <span style="font-size: 11px;">Strongly Agree</span>
+                            </div>
+                        </div>
+
+                        <div class="survey-question">
+                            <div class="survey-question-text">I feel comfortable asking for help when I need it</div>
+                            <div class="likert-scale">
+                                <button class="likert-btn" onclick="selectLikert(this, 'q4')">1</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q4')">2</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q4')">3</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q4')">4</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q4')">5</button>
+                            </div>
+                            <div class="slider-labels" style="margin-top: 8px;">
+                                <span style="font-size: 11px;">Strongly Disagree</span>
+                                <span style="font-size: 11px;">Disagree</span>
+                                <span style="font-size: 11px;">Neutral</span>
+                                <span style="font-size: 11px;">Agree</span>
+                                <span style="font-size: 11px;">Strongly Agree</span>
+                            </div>
+                        </div>
+
+                        <div class="survey-question">
+                            <div class="survey-question-text">Most of my success comes from my own efforts alone</div>
+                            <div class="likert-scale">
+                                <button class="likert-btn" onclick="selectLikert(this, 'q5')">1</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q5')">2</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q5')">3</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q5')">4</button>
+                                <button class="likert-btn" onclick="selectLikert(this, 'q5')">5</button>
+                            </div>
+                            <div class="slider-labels" style="margin-top: 8px;">
+                                <span style="font-size: 11px;">Strongly Disagree</span>
+                                <span style="font-size: 11px;">Disagree</span>
+                                <span style="font-size: 11px;">Neutral</span>
+                                <span style="font-size: 11px;">Agree</span>
+                                <span style="font-size: 11px;">Strongly Agree</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="submitSurvey()">Next</button>
+                </div>
+
+                <!-- Screen 3: Results -->
+                <div class="screen" id="screen-results">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 25%"></div>
+                        </div>
+                        <div class="progress-text">1 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <div class="results-container">
+                            <div class="results-card">
+                                <h3>Your Results</h3>
+                                <p style="font-size: 13px; color: var(--text-light); line-height: 1.6;">You tend toward a fixed view of networking — and that's totally normal.</p>
+                            </div>
+
+                            <div class="results-card">
+                                <h3>How Your Class Responded</h3>
+                                <div class="bar-chart">
+                                    <div class="chart-bar">
+                                        <div class="chart-label">
+                                            <span>1-2 (Developing)</span>
+                                            <span>15%</span>
+                                        </div>
+                                        <div class="chart-bar-container">
+                                            <div class="chart-bar-fill" style="width: 15%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-bar">
+                                        <div class="chart-label">
+                                            <span>3 (Progressing)</span>
+                                            <span>25%</span>
+                                        </div>
+                                        <div class="chart-bar-container">
+                                            <div class="chart-bar-fill" style="width: 25%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-bar">
+                                        <div class="chart-label">
+                                            <span>4-5 (Strong)</span>
+                                            <span>60%</span>
+                                        </div>
+                                        <div class="chart-bar-container">
+                                            <div class="chart-bar-fill" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="results-card">
+                                <h3>Key Insight</h3>
+                                <p style="font-size: 13px; color: var(--text-light); line-height: 1.6;">The good news? Networking isn't a personality trait. It's a skill. And you're about to practice it.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('video')">Next</button>
+                </div>
+
+                <!-- Screen 4: Video -->
+                <div class="screen" id="screen-video">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 30%"></div>
+                        </div>
+                        <div class="progress-text">2 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <div style="background: #000; border-radius: 16px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: var(--shadow);">
+                            <div style="text-align: center; color: white;">
+                                <div style="font-size: 48px; margin-bottom: 8px;">▶</div>
+                                <p style="font-size: 12px;">Video: Growth Mindset</p>
+                            </div>
+                        </div>
+
+                        <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--text-dark);">Networking is a skill, not a personality trait</h2>
+                        <p style="font-size: 13px; color: var(--text-light); line-height: 1.6; margin-bottom: 12px;">A brief exploration of how networking abilities develop over time, drawing on research about skill-building and mindset.</p>
+                        <p style="font-size: 12px; color: var(--text-light); margin-bottom: 12px;"><em>Video duration: 4 minutes</em></p>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('pathways')">Next</button>
+                </div>
+
+                <!-- Screen 5: Pathways -->
+                <div class="screen" id="screen-pathways">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 35%"></div>
+                        </div>
+                        <div class="progress-text">2 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">Based on your check-in</h2>
+                        <p style="font-size: 13px; color: var(--text-light); margin-bottom: 20px;">Here are some starting points for you</p>
+
+                        <div class="pathway-cards">
+                            <div class="pathway-card" onclick="goToScreen('hub')">
+                                <h3>What's already helping me keep going?</h3>
+                                <p>Recognize your network</p>
+                            </div>
+                            <div class="pathway-card" onclick="goToScreen('hub')">
+                                <h3>How does support actually move?</h3>
+                                <p>Understand support flow</p>
+                            </div>
+                            <div class="pathway-card" onclick="goToScreen('hub')">
+                                <h3>How do I reach out when I need to?</h3>
+                                <p>Practice connecting</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('hub')">Continue</button>
+                </div>
+
+                <!-- Screen 6: Hub -->
+                <div class="screen" id="screen-hub">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 40%"></div>
+                        </div>
+                        <div class="progress-text">3 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <div class="hub-header">
+                            <h1>Your Learning Hub</h1>
+                            <p>Pick up where you left off</p>
+                        </div>
+
+                        <div style="background: var(--bg-light); border-radius: 16px; padding: 16px; margin-bottom: 20px; box-shadow: var(--shadow);">
+                            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 8px;">Progress: 2 of 5 sections</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 40%"></div>
+                            </div>
+                        </div>
+
+                        <div class="section-grid">
+                            <div class="section-card" onclick="goToScreen('module1-intro')">
+                                <div class="section-card-header">
+                                    <div class="section-card-title">What's already helping me keep going?</div>
+                                    <div class="badge badge-available">Available</div>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-light);">Recognize your existing network</p>
+                            </div>
+
+                            <div class="section-card" onclick="goToScreen('hub')">
+                                <div class="section-card-header">
+                                    <div class="section-card-title">How does support move?</div>
+                                    <div class="badge badge-locked">Locked</div>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-light);">Notice how support flows and connects</p>
+                            </div>
+
+                            <div class="section-card" onclick="goToScreen('hub')">
+                                <div class="section-card-header">
+                                    <div class="section-card-title">What kinds of support show up?</div>
+                                    <div class="badge badge-locked">Locked</div>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-light);">Identify roles within your network</p>
+                            </div>
+
+                            <div class="section-card" onclick="goToScreen('hub')">
+                                <div class="section-card-header">
+                                    <div class="section-card-title">How do I move forward?</div>
+                                    <div class="badge badge-locked">Locked</div>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-light);">Practice connecting with others</p>
+                            </div>
+
+                            <div class="section-card" onclick="goToScreen('hub')">
+                                <div class="section-card-header">
+                                    <div class="section-card-title">What happens after I reach out?</div>
+                                    <div class="badge badge-locked">Locked</div>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-light);">Understand connection rhythms</p>
+                            </div>
+                        </div>
+
+                        <svg class="swoop" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M200 200 C200 120, 160 80, 80 80 C40 80, 10 100, 0 140 L0 200 Z" fill="url(#swoopGrad)" opacity="0.12"/>
+                            <path d="M200 200 C200 150, 170 110, 110 110 C70 110, 40 130, 20 160 L20 200 Z" fill="url(#swoopGrad)" opacity="0.08"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Screen 7: Module 1 Intro -->
+                <div class="screen" id="screen-module1-intro">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%"></div>
+                        </div>
+                        <div class="progress-text">3 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <div class="centered-intro">
+                            <h1>What's Already Helping Me Keep Going?</h1>
+                            <p>Let's discover the people, skills, and habits that already support you</p>
+
+                            <div style="width: 100%; margin-top: 24px; text-align: left;">
+                                <div class="activity-preview">
+                                    <div class="activity-preview-label">Notice</div>
+                                    <div class="activity-preview-desc">Identify moments of connection in your daily life</div>
+                                </div>
+                                <div class="activity-preview">
+                                    <div class="activity-preview-label">Make Meaning</div>
+                                    <div class="activity-preview-desc">Reflect on what these moments reveal about you</div>
+                                </div>
+                                <div class="activity-preview">
+                                    <div class="activity-preview-label">Try Safely</div>
+                                    <div class="activity-preview-desc">Practice reaching out to someone from your list</div>
+                                </div>
+                            </div>
+
+                            <svg class="swoop" viewBox="0 0 150 150">
+                                <path d="M150 0 Q100 50 150 150 L0 150 L0 0" fill="#3B82A0"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('notice-intro')">Start Section</button>
+                </div>
+
+                <!-- Screen 8: Notice Intro -->
+                <div class="screen" id="screen-notice-intro">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 50%"></div>
+                        </div>
+                        <div class="progress-text">4 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <div style="text-align: center; padding: 40px 0;">
+                            <p style="font-size: 20px; font-weight: 600; color: var(--text-dark); margin-bottom: 24px; opacity: 0; animation: fadeInStory 0.6s ease forwards;">The neighbor down the street.</p>
+                            <p style="font-size: 20px; font-weight: 600; color: var(--text-dark); margin-bottom: 24px; opacity: 0; animation: fadeInStory 0.6s ease forwards 0.8s;">A co-worker you haven't talked to in a while.</p>
+                            <p style="font-size: 20px; font-weight: 600; color: var(--text-dark); margin-bottom: 24px; opacity: 0; animation: fadeInStory 0.6s ease forwards 1.6s;">The classmate who left a comment on a class forum.</p>
+                            <div style="margin-top: 48px; padding: 20px; background: var(--bg-light); border-radius: 12px;">
+                                <p style="font-size: 16px; font-weight: 600; color: var(--text-dark); line-height: 1.6;">Who or what helped you make progress in ways you didn't expect?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('notice-chat')">Next</button>
+                </div>
+
+                <!-- Screen 9: Notice Chat -->
+                <div class="screen" id="screen-notice-chat">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 55%"></div>
+                        </div>
+                        <div class="progress-text">4 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--text-dark);">Explore moments when others helped you move forward</h3>
+                        <div class="chat-container">
+                            <div class="chat-bubble chat-ai">
+                                Think about a time when you made progress in school, work, or your personal life. Who or what helped — even in a small way?
+                            </div>
+                            <div class="chat-bubble chat-user">
+                                My coworker Maria shared a study guide I didn't know existed
+                            </div>
+                            <div class="chat-bubble chat-ai">
+                                That's a great example. Maria offered practical help. Can you think of another moment?
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input">
+                        <input type="text" placeholder="Type something...">
+                        <button>→</button>
+                    </div>
+                </div>
+
+                <!-- Screen 10: Meaning Intro -->
+                <div class="screen" id="screen-meaning-intro">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%"></div>
+                        </div>
+                        <div class="progress-text">5 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <div style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                            <h2 style="font-size: 24px; font-weight: 700; color: var(--text-dark); margin-bottom: 12px;">You made a list!</h2>
+                            <p style="font-size: 16px; color: var(--text-light); margin-bottom: 20px;">Now here comes the interesting part.</p>
+                            <p style="font-size: 14px; color: var(--text-light); line-height: 1.6; font-style: italic; margin-bottom: 20px;">And don't worry: you're not contacting anyone. Janice from five years ago is safe…</p>
+                            <div style="background: var(--bg-light); border-radius: 12px; padding: 16px;">
+                                <p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;">Pick 1-2 connections and describe what happened</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('contact-cards')">Continue</button>
+                </div>
+
+                <!-- Screen 11: Contact Cards -->
+                <div class="screen" id="screen-contact-cards">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                        <div class="progress-text">5 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: var(--text-dark);">Who supports you?</h2>
+                        <p style="font-size: 12px; color: var(--text-light); margin-bottom: 16px;">Select the people from your list</p>
+
+                        <div class="contact-card" onclick="toggleContact(this)">
+                            <div class="contact-avatar" style="background: var(--primary-light); color: var(--primary);">M</div>
+                            <div class="contact-info">
+                                <div class="contact-name">Maria</div>
+                                <div class="contact-role" style="display: flex; gap: 6px; margin-top: 4px;">
+                                    <span style="font-size: 11px; background: var(--primary-light); color: var(--primary); padding: 2px 6px; border-radius: 4px;">Helper</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-light); margin-top: 6px;">
+                                    <label style="display: flex; gap: 6px; margin-bottom: 4px;"><input type="checkbox" style="width: 14px; height: 14px;"> Offered practical help</label>
+                                    <label style="display: flex; gap: 6px; margin-bottom: 4px;"><input type="checkbox" style="width: 14px; height: 14px;"> Gave advice</label>
+                                    <label style="display: flex; gap: 6px; margin-bottom: 4px;"><input type="checkbox" style="width: 14px; height: 14px;"> Listened to me</label>
+                                    <label style="display: flex; gap: 6px;"><input type="checkbox" style="width: 14px; height: 14px;"> Encouraged me</label>
+                                </div>
+                            </div>
+                            <div class="contact-checkbox" style="margin-top: auto;"></div>
+                        </div>
+
+                        <div class="contact-card" onclick="toggleContact(this)">
+                            <div class="contact-avatar" style="background: var(--accent-light); color: var(--accent);">A</div>
+                            <div class="contact-info">
+                                <div class="contact-name">Alex</div>
+                                <div class="contact-role" style="display: flex; gap: 6px; margin-top: 4px;">
+                                    <span style="font-size: 11px; background: var(--accent-light); color: var(--accent); padding: 2px 6px; border-radius: 4px;">Encourager</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-light); margin-top: 6px;">
+                                    <label style="display: flex; gap: 6px; margin-bottom: 4px;"><input type="checkbox" style="width: 14px; height: 14px;"> Offered practical help</label>
+                                    <label style="display: flex; gap: 6px; margin-bottom: 4px;"><input type="checkbox" style="width: 14px; height: 14px;"> Gave advice</label>
+                                    <label style="display: flex; gap: 6px; margin-bottom: 4px;"><input type="checkbox" style="width: 14px; height: 14px;"> Listened to me</label>
+                                    <label style="display: flex; gap: 6px;"><input type="checkbox" style="width: 14px; height: 14px;"> Encouraged me</label>
+                                </div>
+                            </div>
+                            <div class="contact-checkbox" style="margin-top: auto;"></div>
+                        </div>
+
+                        <div class="contact-card" onclick="toggleContact(this)">
+                            <div class="contact-avatar" style="background: #FEF9F0; color: #C4956F;">J</div>
+                            <div class="contact-info">
+                                <div class="contact-name">Jordan</div>
+                                <div class="contact-role" style="display: flex; gap: 6px; margin-top: 4px;">
+                                    <span style="font-size: 11px; background: #FEF9F0; color: #C4956F; padding: 2px 6px; border-radius: 4px;">Connector</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-light); margin-top: 6px;">
+                                    <label style="display: flex; gap: 6px; margin-bottom: 4px;"><input type="checkbox" style="width: 14px; height: 14px;"> Offered practical help</label>
+                                    <label style="display: flex; gap: 6px; margin-bottom: 4px;"><input type="checkbox" style="width: 14px; height: 14px;"> Gave advice</label>
+                                    <label style="display: flex; gap: 6px; margin-bottom: 4px;"><input type="checkbox" style="width: 14px; height: 14px;"> Listened to me</label>
+                                    <label style="display: flex; gap: 6px;"><input type="checkbox" style="width: 14px; height: 14px;"> Encouraged me</label>
+                                </div>
+                            </div>
+                            <div class="contact-checkbox" style="margin-top: auto;"></div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('reflections')">Next</button>
+                </div>
+
+                <!-- Screen 12: Reflections -->
+                <div class="screen" id="screen-reflections">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 70%"></div>
+                        </div>
+                        <div class="progress-text">5 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--text-dark);">What did you notice?</h2>
+                        <p style="font-size: 12px; color: var(--text-light); margin-bottom: 16px;">Select all that feel true for you</p>
+
+                        <div class="chip-group">
+                            <div class="chip" onclick="toggleChip(this)">Support showed up in unexpected ways</div>
+                            <div class="chip" onclick="toggleChip(this)">Support wasn't tied to close relationships</div>
+                            <div class="chip" onclick="toggleChip(this)">Systems or routines played a role</div>
+                            <div class="chip" onclick="toggleChip(this)">Progress involved more than just me</div>
+                            <div class="chip" onclick="toggleChip(this)">Something else</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('sticky-board')">Next</button>
+                </div>
+
+                <!-- Screen 13: Sticky Board -->
+                <div class="screen" id="screen-sticky-board">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                        <div class="progress-text">5 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 12px; color: var(--text-dark);">Cohort Insights</h2>
+                        <p style="font-size: 12px; color: var(--text-light); margin-bottom: 16px;">What's your classmates are discovering</p>
+
+                        <div class="sticky-notes">
+                            <div class="sticky-note sticky-blue">I didn't realize my bus driver was part of my support network</div>
+                            <div class="sticky-note sticky-green">My sibling helped without me even asking</div>
+                            <div class="sticky-note sticky-cream">The library staff was there the whole time</div>
+                            <div class="sticky-note sticky-blue">A random comment changed my perspective</div>
+                            <div class="sticky-note sticky-green">My old teacher still believes in me</div>
+                            <div class="sticky-note sticky-cream">Support came from unexpected people</div>
+                        </div>
+
+                        <p style="font-size: 12px; color: var(--text-light); margin-bottom: 12px; margin-top: 20px;">Add your insight</p>
+                        <div style="display: flex; gap: 8px;">
+                            <textarea placeholder="What's something you realized?" style="flex: 1; padding: 10px 12px; border: 2px solid #DDD; border-radius: 8px; font-size: 12px; font-family: 'Plus Jakarta Sans', sans-serif; resize: vertical; min-height: 60px;"></textarea>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('knowledge-check-1')">Next</button>
+                </div>
+
+                <!-- Screen 14: Knowledge Check 1 -->
+                <div class="screen" id="screen-knowledge-check-1">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%"></div>
+                        </div>
+                        <div class="progress-text">5 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <div style="font-size: 12px; color: var(--text-light); font-weight: 600; margin-bottom: 16px;">Check in with yourself</div>
+                        <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">Which feels closer to how you're thinking right now?</h2>
+                        <p style="font-size: 12px; color: var(--text-light); margin-bottom: 20px;">No right answer. Just notice.</p>
+
+                        <div class="belief-card" onclick="selectBelief(this)" data-choice="a">
+                            <div class="belief-card-text">I mostly move forward on my own.</div>
+                        </div>
+
+                        <div class="belief-card" onclick="selectBelief(this)" data-choice="b">
+                            <div class="belief-card-text">Support is often present, even when I don't name it.</div>
+                        </div>
+
+                        <div id="beliefResponse" style="display: none; margin-top: 16px; padding: 16px; background: var(--bg-light); border-radius: 12px;"></div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('knowledge-check-2')">Next</button>
+                </div>
+
+                <!-- Screen 15: Knowledge Check 2 -->
+                <div class="screen" id="screen-knowledge-check-2">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 90%"></div>
+                        </div>
+                        <div class="progress-text">5 of 5</div>
+                    </div>
+                    <div class="screen-body">
+                        <div style="font-size: 12px; color: var(--text-light); font-weight: 600; margin-bottom: 16px;">Shift check</div>
+                        <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">How has your thinking moved?</h2>
+                        <p style="font-size: 12px; color: var(--text-light); margin-bottom: 20px;">Drag the slider to where you are now.</p>
+
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="50" class="slider" id="thinkingSlider" onchange="updateSliderFeedback(this.value)">
+                            <div class="slider-labels">
+                                <span>Support only counts when someone intentionally helps.</span>
+                                <span>Support can be indirect, structural, or show up in ways I didn't expect.</span>
+                            </div>
+                        </div>
+
+                        <div id="sliderFeedback" style="text-align: center; margin-top: 24px; min-height: 40px;">
+                            <p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;"></p>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="goToScreen('recap')">Next</button>
+                </div>
+
+                <!-- Screen 16: Recap -->
+                <div class="screen" id="screen-recap">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">5 of 5 (Complete!)</div>
+                    </div>
+                    <div class="screen-body">
+                        <div style="text-align: center;">
+                            <h2 style="font-size: 24px; font-weight: 700; color: var(--text-dark); margin-bottom: 24px;">Quick recap</h2>
+
+                            <h3 style="font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 16px; text-align: left;">What's already helping me keep going?</h3>
+
+                            <div style="text-align: left;">
+                                <div style="margin-bottom: 16px;">
+                                    <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">Support is often invisible</div>
+                                    <div style="font-size: 12px; color: var(--text-light); line-height: 1.6;">We don't always notice when others are helping us move forward. Slowing down to notice changes what we see.</div>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">Helpers take many forms</div>
+                                    <div style="font-size: 12px; color: var(--text-light); line-height: 1.6;">Support isn't always from best friends. It comes from coworkers, teachers, neighbors, and sometimes systems we rely on.</div>
+                                </div>
+                                <div style="margin-bottom: 24px;">
+                                    <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">You're not as alone as you think</div>
+                                    <div style="font-size: 12px; color: var(--text-light); line-height: 1.6;">Most progress isn't solo. Looking back reveals networks we didn't know we had.</div>
+                                </div>
+                            </div>
+
+                            <div style="background: var(--primary-light); border-radius: 12px; padding: 12px; margin-bottom: 24px;">
+                                <div style="font-size: 12px; font-weight: 600; color: var(--primary);">Section 1 Complete!</div>
+                            </div>
+
+                            <div style="background: var(--bg-light); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                                <p style="font-size: 12px; color: var(--text-dark); margin-bottom: 12px; font-weight: 600;">Want to dig deeper?</p>
+                                <button class="btn btn-secondary" style="width: 100%;">Talk it Through</button>
+                            </div>
+
+                            <svg class="swoop" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M200 200 C200 120, 160 80, 80 80 C40 80, 10 100, 0 140 L0 200 Z" fill="url(#swoopGrad)" opacity="0.12"/>
+                                <path d="M200 200 C200 150, 170 110, 110 110 C70 110, 40 130, 20 160 L20 200 Z" fill="url(#swoopGrad)" opacity="0.08"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="completeModule()">Back to Hub</button>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="goToScreen('hub'); updateNav(0)">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.5 1.5H3C2.17 1.5 1.5 2.17 1.5 3v14c0 .83.67 1.5 1.5 1.5h14c.83 0 1.5-.67 1.5-1.5V9.5"/>
+                            <path d="M6 11h8M6 14h5"/>
+                        </svg>
+                    </div>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="updateNav(1)">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 1C5.58 1 2 4.58 2 9c0 3.25 2.3 6.02 5.44 6.76.2.04.24.11.24.25v1.37c0 .2.08.31.27.31.35 0 2.5-1.73 3.42-2.35.42.06.84.09 1.28.09 4.42 0 8-3.58 8-8S14.42 1 10 1z"/>
+                        </svg>
+                    </div>
+                    <span>Map</span>
+                </div>
+                <div class="nav-item" onclick="updateNav(2)">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M3 2h14c.55 0 1 .45 1 1v14c0 .55-.45 1-1 1H3c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1zm2 2v2h10V4H5zm0 4v8h10V8H5z"/>
+                        </svg>
+                    </div>
+                    <span>Toolkit</span>
+                </div>
+                <div class="nav-item" onclick="updateNav(3)">
+                    <div class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 10c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V18h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                        </svg>
+                    </div>
+                    <span>Profile</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let currentScreen = 'welcome';
+        let surveyAnswers = {};
+        let selectedChips = [];
+
+        // Navigation
+        function goToScreen(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+
+            const targetScreen = document.getElementById(`screen-${screenId}`);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                currentScreen = screenId;
+                document.getElementById('screenContent').scrollTop = 0;
+            }
+        }
+
+        // Carousel
+        function goToCarouselSlide(index) {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const dots = document.querySelectorAll('.dot');
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+
+        // Survey
+        function selectLikert(button, question) {
+            const container = button.parentElement;
+            const buttons = container.querySelectorAll('.likert-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            surveyAnswers[question] = button.textContent;
+        }
+
+        function submitSurvey() {
+            const answered = Object.keys(surveyAnswers).length === 5;
+            if (answered) {
+                goToScreen('results');
+            } else {
+                alert('Please answer all questions');
+            }
+        }
+
+        // Chips
+        function toggleChip(element) {
+            element.classList.toggle('selected');
+            const text = element.textContent;
+            if (element.classList.contains('selected')) {
+                if (!selectedChips.includes(text)) selectedChips.push(text);
+            } else {
+                selectedChips = selectedChips.filter(chip => chip !== text);
+            }
+        }
+
+        // Contact Cards
+        function toggleContact(element) {
+            element.classList.toggle('selected');
+        }
+
+        // Belief Selection
+        function selectBelief(element) {
+            const container = element.parentElement;
+            const cards = container.querySelectorAll('.belief-card');
+            cards.forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const responseDiv = document.getElementById('beliefResponse');
+            responseDiv.style.display = 'block';
+
+            if (element.dataset.choice === 'a') {
+                responseDiv.innerHTML = '<p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;">That\'s where a lot of people start. As you keep going, you may notice that support was there more often than you realized — just in quieter forms.</p>';
+            } else {
+                responseDiv.innerHTML = '<p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;">That shift matters. Noticing support that\'s already present changes how you move through challenges — even before anything else changes.</p>';
+            }
+        }
+
+        // Slider Feedback
+        function updateSliderFeedback(value) {
+            const feedback = document.getElementById('sliderFeedback');
+            const val = parseInt(value);
+            let message = '';
+            if (val < 30) {
+                message = "Still leaning toward your earlier thinking. That's okay — shifts take time.";
+            } else if (val < 60) {
+                message = "Somewhere in between. You're noticing new things without throwing out what you knew before.";
+            } else {
+                message = "You're seeing support differently now. That awareness is the foundation for everything that comes next.";
+            }
+            feedback.innerHTML = `<p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;">${message}</p>`;
+        }
+
+        // Complete Module
+        function completeModule() {
+            goToScreen('hub');
+        }
+
+        // Navigation Update
+        function updateNav(index) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            navItems[index].classList.add('active');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            goToCarouselSlide(0);
+            updateSliderFeedback(50);
+        });
+    </script>
+</body>
+</html>
+
